@@ -142,7 +142,6 @@
             position: relative;
             text-align: center;
             padding: 10px;
-            /* SE AÑADE TRANSICIÓN PARA EL HOVER */
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
@@ -153,7 +152,6 @@
             cursor: pointer;
         }
 
-        /* --- NUEVA ANIMACIÓN HOVER --- */
         .sticker.owned:hover {
             transform: translateY(-10px) scale(1.05);
             box-shadow: 0 10px 25px rgba(255, 204, 0, 0.3);
@@ -165,7 +163,6 @@
             border-color: rgba(0, 212, 255, 0.4);
             background: rgba(255, 255, 255, 0.08);
         }
-        /* ----------------------------- */
 
         .repeat-tag {
             position: absolute;
@@ -195,7 +192,7 @@
     </header>
 
     <div class="progress-section">
-        <strong id="statsText">0 / 21 FIGURITAS</strong>
+        <strong id="statsText">0 / 0 FIGURITAS</strong>
         <div id="repeat-count" style="color: var(--accent-blue); font-size: 0.9rem; margin-top: 5px;">Repetidas: 0</div>
         <div class="progress-bar"><div id="progress-fill"></div></div>
     </div>
@@ -232,6 +229,10 @@
         <button class="nav-btn" onclick="showPage(5)">Pág 5</button>
         <button class="nav-btn" onclick="showPage(6)">Pág 6</button>
         <button class="nav-btn" onclick="showPage(7)">Pág 7</button>
+        <!-- Nuevas Páginas -->
+        <button class="nav-btn" onclick="showPage(8)">Pág 8</button>
+        <button class="nav-btn" onclick="showPage(9)">Pág 9</button>
+        <button class="nav-btn" onclick="showPage(10)">Pág 10</button>
     </div>
 
     <div id="p1" class="album-page active"></div>
@@ -241,6 +242,9 @@
     <div id="p5" class="album-page"></div>
     <div id="p6" class="album-page"></div>
     <div id="p7" class="album-page"></div>
+    <div id="p8" class="album-page"></div>
+    <div id="p9" class="album-page"></div>
+    <div id="p10" class="album-page"></div>
 
     <button class="btn-reset" onclick="resetAlbum()">Reiniciar Álbum</button>
 
@@ -267,7 +271,19 @@
                 { id: 17, name: "Clases Grabadas", page: 6, icon: "🎥" },
                 { id: 18, name: "Alpha Dx Oro", page: 7, icon: "🥇" },
                 { id: 19, name: "Alpha Dx Plata", page: 7, icon: "🥈" },
-                { id: 20, name: "Alpha Dx Cobre", page: 7, icon: "🥉" }
+                { id: 20, name: "Alpha Dx Cobre", page: 7, icon: "🥉" },
+                // --- PÁGINA 8 ---
+                { id: 21, name: "Porfirio Díaz", page: 8, icon: "🎩" },
+                { id: 22, name: "Álvaro Obregón", page: 8, icon: "🎖️" },
+                { id: 23, name: "Emiliano Zapata", page: 8, icon: "🐎" },
+                // --- PÁGINA 9 ---
+                { id: 24, name: "Isaac Newton", page: 9, icon: "🍎" },
+                { id: 25, name: "Pitágoras", page: 9, icon: "📐" },
+                { id: 26, name: "Einstein", page: 9, icon: "🧠" },
+                // --- PÁGINA 10 ---
+                { id: 27, name: "Relieve", page: 10, icon: "⛰️" },
+                { id: 28, name: "Clima", page: 10, icon: "☀️" },
+                { id: 29, name: "Vegetación", page: 10, icon: "🌿" }
             ],
             tradeCost: 2
         };
@@ -375,7 +391,8 @@
         }
 
         function updateUI() {
-            for (let i = 1; i <= 7; i++) {
+            const totalPages = 10;
+            for (let i = 1; i <= totalPages; i++) {
                 const container = document.getElementById(`p${i}`);
                 if (!container) continue;
                 container.innerHTML = '';
