@@ -52,6 +52,54 @@
             color: var(--accent-blue);
         }
 
+        /* --- MODAL DE APERTURA --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            perspective: 1000px;
+        }
+
+        .modal-content { text-align: center; }
+
+        .card-inner {
+            width: 220px;
+            height: 310px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card-inner.flipped { transform: rotateY(180deg); }
+
+        .card-back, .card-front {
+            position: absolute;
+            width: 100%; height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            border: 4px solid var(--accent-gold);
+            box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+        }
+
+        .card-back {
+            background: var(--card-bg);
+            font-size: 5rem;
+        }
+
+        .card-front {
+            background: linear-gradient(145deg, #162c50, #050b18);
+            transform: rotateY(180deg);
+        }
+
+        /* --- UI DEL JUEGO --- */
         .game-container {
             display: flex;
             gap: 20px;
@@ -73,8 +121,6 @@
             text-align: center;
             border: 1px solid rgba(255,255,255,0.1);
         }
-
-        .trade-panel { border-color: var(--trade-purple); }
 
         .math-box {
             font-size: 2.2rem;
@@ -115,21 +161,20 @@
         button:hover:not(:disabled) { transform: scale(1.05); }
         button:disabled { opacity: 0.5; filter: grayscale(1); cursor: not-allowed; }
 
-        .btn-trade { background: var(--trade-purple); color: white; margin-top: 10px; }
-
-        .album-nav { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .nav-btn { background: transparent; color: white; border: 1px solid var(--accent-blue); padding: 8px 15px; }
+        .album-nav { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .nav-btn { background: transparent; color: white; border: 1px solid var(--accent-blue); padding: 6px 12px; font-size: 0.8rem; }
         .nav-btn.active { background: var(--accent-blue); color: var(--primary-dark); }
 
         .album-page {
             display: none;
             width: 100%;
             max-width: 900px;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
         }
         .album-page.active { display: grid; animation: fadeIn 0.4s; }
 
+        /* --- STICKERS --- */
         .sticker {
             aspect-ratio: 3/4;
             background: var(--empty-slot);
@@ -140,28 +185,30 @@
             align-items: center;
             justify-content: center;
             position: relative;
-            text-align: center;
-            padding: 10px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s ease;
+        }
+
+        .sticker:not(.owned):hover {
+            border-color: var(--accent-blue);
+            background: rgba(0, 212, 255, 0.08);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.2);
+        }
+        
+        .sticker:not(.owned):hover div {
+            animation: pulseHint 1s infinite;
+            color: var(--accent-blue);
         }
 
         .sticker.owned {
             background: linear-gradient(145deg, #162c50, #0a192f);
             border: 2px solid var(--accent-gold);
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
         }
 
         .sticker.owned:hover {
-            transform: translateY(-10px) scale(1.05);
-            box-shadow: 0 10px 25px rgba(255, 204, 0, 0.3);
-            border-color: var(--accent-blue);
-            z-index: 10;
-        }
-
-        .sticker:not(.owned):hover {
-            border-color: rgba(0, 212, 255, 0.4);
-            background: rgba(255, 255, 255, 0.08);
+            transform: scale(1.05);
+            z-index: 5;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
 
         .repeat-tag {
@@ -178,10 +225,12 @@
         .progress-bar { height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; margin-top: 10px; overflow: hidden; }
         #progress-fill { height: 100%; background: var(--accent-gold); width: 0%; transition: width 1s ease; }
 
-        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .btn-reset { margin-top: 40px; background: transparent; color: #ff4757; border: 1px solid #ff4757; font-size: 0.7rem; margin-bottom: 20px; }
+        @keyframes pulseHint {
+            0% { transform: scale(1); opacity: 0.1; }
+            50% { transform: scale(1.2); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 0.1; }
+        }
     </style>
 </head>
 <body>
@@ -192,7 +241,7 @@
     </header>
 
     <div class="progress-section">
-        <strong id="statsText">0 / 0 FIGURITAS</strong>
+        <strong id="statsText">0 / 45 FIGURITAS</strong>
         <div id="repeat-count" style="color: var(--accent-blue); font-size: 0.9rem; margin-top: 5px;">Repetidas: 0</div>
         <div class="progress-bar"><div id="progress-fill"></div></div>
     </div>
@@ -213,40 +262,34 @@
             </div>
         </div>
 
-        <div class="panel trade-panel">
-            <h3 style="color: var(--trade-purple);">CENTRO DE TRADEO</h3>
-            <p style="font-size: 0.8rem;">Cambia 2 repetidas por una carta aleatoria</p>
-            <div id="trade-visual" style="font-size: 2rem; margin: 10px 0;">🔄</div>
-            <button id="btnTrade" class="btn-trade" onclick="handleTrade()" disabled>Intercambiar (2)</button>
+        <div class="panel">
+            <h3 style="color: var(--trade-purple);">TRADEO</h3>
+            <p style="font-size: 0.8rem;">Canjea 2 repetidas</p>
+            <div style="font-size: 2rem; margin: 10px 0;">🔄</div>
+            <button id="btnTrade" style="background: var(--trade-purple); color:white" onclick="handleTrade()" disabled>Intercambiar (2)</button>
         </div>
     </div>
 
-    <div class="album-nav">
-        <button class="nav-btn active" onclick="showPage(1)">Pág 1</button>
-        <button class="nav-btn" onclick="showPage(2)">Pág 2</button>
-        <button class="nav-btn" onclick="showPage(3)">Pág 3</button>
-        <button class="nav-btn" onclick="showPage(4)">Pág 4</button>
-        <button class="nav-btn" onclick="showPage(5)">Pág 5</button>
-        <button class="nav-btn" onclick="showPage(6)">Pág 6</button>
-        <button class="nav-btn" onclick="showPage(7)">Pág 7</button>
-        <!-- Nuevas Páginas -->
-        <button class="nav-btn" onclick="showPage(8)">Pág 8</button>
-        <button class="nav-btn" onclick="showPage(9)">Pág 9</button>
-        <button class="nav-btn" onclick="showPage(10)">Pág 10</button>
+    <div class="album-nav" id="nav-container"></div>
+    <div id="pages-container"></div>
+
+    <!-- MODAL DE APERTURA -->
+    <div id="card-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div id="card-reveal" class="card-inner">
+                <div class="card-back">📦</div>
+                <div class="card-front">
+                    <div id="modal-icon" style="font-size: 5rem;"></div>
+                    <div id="modal-name" style="font-size: 1.4rem; font-weight: bold; margin-top: 15px; padding: 0 10px;"></div>
+                    <div id="modal-rarity" style="color: var(--accent-gold); margin-top: 10px; font-weight: bold;"></div>
+                </div>
+            </div>
+            <br>
+            <button onclick="closeModal()" style="margin-top: 20px;">Coleccionar</button>
+        </div>
     </div>
 
-    <div id="p1" class="album-page active"></div>
-    <div id="p2" class="album-page"></div>
-    <div id="p3" class="album-page"></div>
-    <div id="p4" class="album-page"></div>
-    <div id="p5" class="album-page"></div>
-    <div id="p6" class="album-page"></div>
-    <div id="p7" class="album-page"></div>
-    <div id="p8" class="album-page"></div>
-    <div id="p9" class="album-page"></div>
-    <div id="p10" class="album-page"></div>
-
-    <button class="btn-reset" onclick="resetAlbum()">Reiniciar Álbum</button>
+    <button class="btn-reset" style="margin-top:40px; opacity:0.5; background:transparent; color:red; border:1px solid red" onclick="resetAlbum()">Reiniciar Álbum</button>
 
     <script>
         const CONFIG = {
@@ -272,18 +315,35 @@
                 { id: 18, name: "Alpha Dx Oro", page: 7, icon: "🥇" },
                 { id: 19, name: "Alpha Dx Plata", page: 7, icon: "🥈" },
                 { id: 20, name: "Alpha Dx Cobre", page: 7, icon: "🥉" },
-                // --- PÁGINA 8 ---
                 { id: 21, name: "Porfirio Díaz", page: 8, icon: "🎩" },
                 { id: 22, name: "Álvaro Obregón", page: 8, icon: "🎖️" },
                 { id: 23, name: "Emiliano Zapata", page: 8, icon: "🐎" },
-                // --- PÁGINA 9 ---
                 { id: 24, name: "Isaac Newton", page: 9, icon: "🍎" },
                 { id: 25, name: "Pitágoras", page: 9, icon: "📐" },
                 { id: 26, name: "Einstein", page: 9, icon: "🧠" },
-                // --- PÁGINA 10 ---
                 { id: 27, name: "Relieve", page: 10, icon: "⛰️" },
                 { id: 28, name: "Clima", page: 10, icon: "☀️" },
-                { id: 29, name: "Vegetación", page: 10, icon: "🌿" }
+                { id: 29, name: "Vegetación", page: 10, icon: "🌿" },
+                // --- PÁGINA 11: Música ---
+                { id: 30, name: "Jay Z", page: 11, icon: "🎤" },
+                { id: 31, name: "Kanye", page: 11, icon: "🕶️" },
+                { id: 32, name: "Eminem", page: 11, icon: "📻" },
+                // --- PÁGINA 12: Química ---
+                { id: 33, name: "Enlace Covalente", page: 12, icon: "🤝" },
+                { id: 34, name: "Enlace Iónico", page: 12, icon: "🔋" },
+                { id: 35, name: "Enlace Metálico", page: 12, icon: "🏗️" },
+                // --- PÁGINA 13: Personajes Históricos ---
+                { id: 36, name: "Napoleon Bonaparte", page: 13, icon: "⚔️" },
+                { id: 37, name: "Leonardo da Vinci", page: 13, icon: "🎨" },
+                { id: 38, name: "Galileo Galilei", page: 13, icon: "🔭" },
+                // --- PÁGINA 14: Políticos USA ---
+                { id: 39, name: "George Washington", page: 14, icon: "🏛️" },
+                { id: 40, name: "Abraham Lincoln", page: 14, icon: "🎩" },
+                { id: 41, name: "Thomas Jefferson", page: 14, icon: "🖋️" },
+                // --- PÁGINA 15: Instituciones ---
+                { id: 42, name: "CCH", page: 15, icon: "🏫" },
+                { id: 43, name: "ENP", page: 15, icon: "🏫" },
+                { id: 44, name: "CECyT", page: 15, icon: "🏫" }
             ],
             tradeCost: 2
         };
@@ -292,13 +352,21 @@
         let currentResult = 0;
         let audioCtx = null;
 
+        function buildAlbumStructure() {
+            const nav = document.getElementById('nav-container');
+            const container = document.getElementById('pages-container');
+            nav.innerHTML = '';
+            container.innerHTML = '';
+            const maxPage = 15;
+            for(let i=1; i<=maxPage; i++) {
+                nav.innerHTML += `<button class="nav-btn ${i===1?'active':''}" onclick="showPage(${i})">Pág ${i}</button>`;
+                container.innerHTML += `<div id="p${i}" class="album-page ${i===1?'active':''}"></div>`;
+            }
+        }
+
         function initAudio() {
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
         function playSound(freq, type, duration, vol = 0.1) {
@@ -320,46 +388,56 @@
             const op = ops[Math.floor(Math.random() * ops.length)];
             let n1 = Math.floor(Math.random() * 10) + 1;
             let n2 = Math.floor(Math.random() * 10) + 1;
-            
-            if (op === '+') currentResult = n1 + n2;
-            if (op === '-') currentResult = n1 - n2;
-            if (op === '*') currentResult = n1 * n2;
-
-            const symbols = { '+': '+', '-': '-', '*': '×' };
-            document.getElementById('equation').innerText = `${n1} ${symbols[op]} ${n2}`;
+            currentResult = (op==='+')? n1+n2 : (op==='-')? n1-n2 : n1*n2;
+            document.getElementById('equation').innerText = `${n1} ${(op==='*')?'×':op} ${n2}`;
             document.getElementById('user-answer').value = '';
         }
 
         function checkMath() {
-            initAudio();
             const val = parseInt(document.getElementById('user-answer').value);
             if (val === currentResult) {
-                playSound(880, 'sine', 0.2); 
+                playSound(880, 'sine', 0.2);
                 document.getElementById('quiz-ui').style.display = 'none';
                 document.getElementById('reward-ui').style.display = 'block';
             } else {
-                playSound(150, 'sawtooth', 0.3); 
-                alert("¡Sigue intentando!");
+                playSound(150, 'sawtooth', 0.3);
+                alert("¡Error! Revisa tus cálculos.");
             }
         }
 
         function openPack() {
             const randomCard = CONFIG.cards[Math.floor(Math.random() * CONFIG.cards.length)];
-            addCard(randomCard);
+            const isNew = !inventory[randomCard.id];
+            
+            inventory[randomCard.id] = (inventory[randomCard.id] || 0) + 1;
+            localStorage.setItem('alphaDxPremium', JSON.stringify(inventory));
+
+            document.getElementById('modal-icon').innerText = randomCard.icon;
+            document.getElementById('modal-name').innerText = randomCard.name;
+            document.getElementById('modal-rarity').innerText = isNew ? "✨ ¡NUEVA!" : "🃏 REPETIDA";
+            document.getElementById('modal-rarity').style.color = isNew ? "var(--accent-gold)" : "#aaa";
+            
+            const modal = document.getElementById('card-modal');
+            const cardInner = document.getElementById('card-reveal');
+            modal.style.display = 'flex';
+            cardInner.classList.remove('flipped');
+
+            setTimeout(() => {
+                cardInner.classList.add('flipped');
+                playSound(600, 'sine', 0.4);
+            }, 500);
+
+            updateUI();
+            newChallenge();
             document.getElementById('quiz-ui').style.display = 'block';
             document.getElementById('reward-ui').style.display = 'none';
-            newChallenge();
+        }
+
+        function closeModal() {
+            document.getElementById('card-modal').style.display = 'none';
         }
 
         function handleTrade() {
-            initAudio();
-            const totalRepeats = calculateRepeats();
-            if (totalRepeats < CONFIG.tradeCost) return;
-
-            playSound(300, 'square', 0.1);
-            setTimeout(() => playSound(450, 'square', 0.1), 100);
-            setTimeout(() => playSound(600, 'square', 0.2), 200);
-
             let consumed = 0;
             for (let id in inventory) {
                 while (inventory[id] > 1 && consumed < CONFIG.tradeCost) {
@@ -367,32 +445,11 @@
                     consumed++;
                 }
             }
-            
-            const randomCard = CONFIG.cards[Math.floor(Math.random() * CONFIG.cards.length)];
-            setTimeout(() => addCard(randomCard), 400);
-        }
-
-        function addCard(card) {
-            const isNew = !inventory[card.id];
-            inventory[card.id] = (inventory[card.id] || 0) + 1;
-            localStorage.setItem('alphaDxPremium', JSON.stringify(inventory));
-            
-            playSound(523, 'sine', 0.1);
-            setTimeout(() => playSound(783, 'sine', 0.4), 100);
-
-            alert(`${isNew ? '✨ ¡NUEVA FIGURITA!' : '🃏 REPETIDA'}\nHas obtenido: ${card.name}`);
-            
-            updateUI();
-            showPage(card.page);
-        }
-
-        function calculateRepeats() {
-            return Object.values(inventory).reduce((acc, c) => acc + (c > 1 ? c - 1 : 0), 0);
+            openPack();
         }
 
         function updateUI() {
-            const totalPages = 10;
-            for (let i = 1; i <= totalPages; i++) {
+            for (let i = 1; i <= 15; i++) {
                 const container = document.getElementById(`p${i}`);
                 if (!container) continue;
                 container.innerHTML = '';
@@ -400,22 +457,16 @@
                     const count = inventory[card.id] || 0;
                     const div = document.createElement('div');
                     div.className = `sticker ${count > 0 ? 'owned' : ''}`;
-                    if (count > 0) {
-                        div.innerHTML = `
-                            <div style="font-size:3rem">${card.icon}</div>
-                            <div style="font-size:0.8rem; font-weight:bold">${card.name}</div>
-                            ${count > 1 ? `<div class="repeat-tag">x${count-1}</div>` : ''}
-                        `;
-                    } else {
-                        div.innerHTML = `<div style="opacity:0.1; font-size:2rem">?</div>`;
-                    }
+                    div.innerHTML = count > 0 ? 
+                        `<div style="font-size:2.5rem">${card.icon}</div><div style="font-size:0.7rem;font-weight:bold">${card.name}</div>${count>1?`<div class="repeat-tag">x${count-1}</div>`:''}` :
+                        `<div style="opacity:0.1; font-size:2rem">?</div>`;
                     container.appendChild(div);
                 });
             }
 
             const unique = Object.keys(inventory).length;
             const total = CONFIG.cards.length;
-            const repeats = calculateRepeats();
+            const repeats = Object.values(inventory).reduce((acc, c) => acc + (c > 1 ? c - 1 : 0), 0);
             
             document.getElementById('statsText').innerText = `${unique} / ${total} FIGURITAS`;
             document.getElementById('progress-fill').style.width = `${(unique/total)*100}%`;
@@ -424,24 +475,19 @@
         }
 
         function showPage(num) {
-            playSound(440, 'triangle', 0.05, 0.05); 
+            playSound(440, 'triangle', 0.05, 0.05);
             document.querySelectorAll('.album-page').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            const pageTarget = document.getElementById(`p${num}`);
-            if(pageTarget) pageTarget.classList.add('active');
-            
-            const navBtns = document.querySelectorAll('.nav-btn');
-            if(navBtns[num-1]) navBtns[num-1].classList.add('active');
+            document.getElementById(`p${num}`).classList.add('active');
+            const btns = document.querySelectorAll('.nav-btn');
+            if(btns[num-1]) btns[num-1].classList.add('active');
         }
 
         function resetAlbum() {
-            if(confirm("¿Seguro que quieres borrar todo el progreso?")) {
-                localStorage.removeItem('alphaDxPremium');
-                location.reload();
-            }
+            if(confirm("¿Borrar todo?")) { localStorage.removeItem('alphaDxPremium'); location.reload(); }
         }
 
+        buildAlbumStructure();
         updateUI();
         newChallenge();
     </script>
